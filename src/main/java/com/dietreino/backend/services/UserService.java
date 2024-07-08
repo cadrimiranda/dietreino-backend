@@ -7,6 +7,7 @@ import com.dietreino.backend.dto.user.UserEditDTO;
 import com.dietreino.backend.dto.user.UserRequestDTO;
 import com.dietreino.backend.dto.user.UserResponse;
 import com.dietreino.backend.dto.user.UsersByTrainerDTO;
+import com.dietreino.backend.exceptions.InvalidEmailOrPassword;
 import com.dietreino.backend.exceptions.WorkoutWithoutUser;
 import com.dietreino.backend.repositories.UserRepository;
 import com.dietreino.backend.utils.DateUtils;
@@ -135,10 +136,12 @@ public class UserService {
 
     public User verifyPassword(LoginRequestDTO loginRequestDTO) {
         validateEmail(loginRequestDTO.email());
-        User user = this.userRepository.findByEmail(loginRequestDTO.email()).orElseThrow(() -> new RuntimeException("Invalid email or password"));
+        User user = this.userRepository
+                .findByEmail(loginRequestDTO.email())
+                .orElseThrow(InvalidEmailOrPassword::new);
 
         if (!passwordEncoder.matches(loginRequestDTO.password(), user.getPassword())) {
-            throw new IllegalArgumentException("Invalid password");
+            throw new InvalidEmailOrPassword();
         }
 
         return user;

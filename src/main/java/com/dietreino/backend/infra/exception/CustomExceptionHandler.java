@@ -2,6 +2,7 @@ package com.dietreino.backend.infra.exception;
 
 import com.dietreino.backend.exceptions.CannotDeleteExerciseInsideSetups;
 import com.dietreino.backend.exceptions.IdCannotBeNullWhileFinding;
+import com.dietreino.backend.exceptions.InvalidEmailOrPassword;
 import com.dietreino.backend.exceptions.WorkoutWithoutUser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +17,6 @@ public class CustomExceptionHandler {
         ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
-//
-//    @ExceptionHandler(RuntimeException.class)
-//    private ResponseEntity<ErrorMessage> runtimeException(RuntimeException exception) {
-//        ErrorMessage errorMessage = new ErrorMessage(exception.getCause().toString(), HttpStatus.INTERNAL_SERVER_ERROR);
-//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
-//    }
 
     @ExceptionHandler(IdCannotBeNullWhileFinding.class)
     private ResponseEntity<ErrorMessage> idCannotBeNullWhileFinding(IdCannotBeNullWhileFinding exception) {
@@ -37,6 +32,12 @@ public class CustomExceptionHandler {
   
     @ExceptionHandler(CannotDeleteExerciseInsideSetups.class)
     private ResponseEntity<ErrorMessage> cannotDeleteExerciseInsideSetups(CannotDeleteExerciseInsideSetups exception) {
+        ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(InvalidEmailOrPassword.class)
+    private ResponseEntity<ErrorMessage> invalidLoginEmail(InvalidEmailOrPassword exception) {
         ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
