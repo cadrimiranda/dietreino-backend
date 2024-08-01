@@ -108,7 +108,7 @@ public class ExerciseService {
 
     public void delete(UUID id) {
         if (this.existSetupsByExercise(id)) {
-            throw new CannotDeleteExerciseInsideSetups();
+            throw new CannotDeleteExerciseInsideSetups(id);
         }
 
         Exercise exercise = this.findDomainById(id);

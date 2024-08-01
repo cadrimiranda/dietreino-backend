@@ -1,6 +1,5 @@
 package com.dietreino.backend.infra.exception;
 
-import com.dietreino.backend.exceptions.CannotDeleteExerciseInsideSetups;
 import com.dietreino.backend.exceptions.IdCannotBeNullWhileFinding;
 import com.dietreino.backend.exceptions.InvalidEmailOrPassword;
 import com.dietreino.backend.exceptions.WorkoutWithoutUser;
@@ -26,12 +25,6 @@ public class CustomExceptionHandler {
 
     @ExceptionHandler(WorkoutWithoutUser.class)
     private ResponseEntity<ErrorMessage> workoutWithoutUser(WorkoutWithoutUser exception) {
-        ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), HttpStatus.BAD_REQUEST);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
-    }
-  
-    @ExceptionHandler(CannotDeleteExerciseInsideSetups.class)
-    private ResponseEntity<ErrorMessage> cannotDeleteExerciseInsideSetups(CannotDeleteExerciseInsideSetups exception) {
         ErrorMessage errorMessage = new ErrorMessage(exception.getMessage(), HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
