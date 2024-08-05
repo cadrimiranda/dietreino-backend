@@ -4,9 +4,8 @@ import com.dietreino.backend.domain.ExerciseSet;
 import com.dietreino.backend.domain.User;
 import com.dietreino.backend.domain.Workout;
 import com.dietreino.backend.dto.exerciseSet.ExerciseSetFullSetupDTO;
-import com.dietreino.backend.dto.exerciseSet.ExerciseSetRequestDTO;
 import com.dietreino.backend.dto.exerciseSetup.ExerciseSetupFullDTO;
-import com.dietreino.backend.dto.exerciseSetup.ExerciseSetupRequestDTO;
+import com.dietreino.backend.dto.workout.RoutineHistoryRequest;
 import com.dietreino.backend.dto.workout.WorkoutPutRequestDTO;
 import com.dietreino.backend.dto.workout.WorkoutRequestDTO;
 import com.dietreino.backend.repositories.WorkoutRepository;
@@ -25,28 +24,24 @@ public class WorkoutService extends CRUDService<Workout, WorkoutRequestDTO> {
     private final ExerciseSetService exerciseSetService;
     private final WorkoutRepository workoutRepository;
     private final ExerciseSetupService exerciseSetupService;
+    private final RoutineHistoryService routineHistoryService;
     private final UserService userService;
     private final List<String> fields = List.of("Name", "Description");
 
     @Autowired
     public WorkoutService(WorkoutRepository workoutRepository, ExerciseSetService exerciseSetService,
-                          ExerciseSetupService exerciseSetupService, UserService userService) {
+                          ExerciseSetupService exerciseSetupService, UserService userService, RoutineHistoryService routineHistoryService) {
         this.workoutRepository = workoutRepository;
         this.exerciseSetService = exerciseSetService;
         this.exerciseSetupService = exerciseSetupService;
         this.userService = userService;
+        this.routineHistoryService = routineHistoryService;
     }
 
     @Override
     public Workout convertDto(WorkoutRequestDTO dto) {
         validateDto(dto);
-        return Workout.builder()
-                .name(dto.name())
-                .description(dto.description())
-                .startDate(dto.startDate())
-                .endDate(dto.endDate())
-                .exerciseSets(new ArrayList<>())
-                .build();
+        return dto.toWorkoutEntity();
     }
 
     @Override
@@ -95,9 +90,7 @@ public class WorkoutService extends CRUDService<Workout, WorkoutRequestDTO> {
 
     public Workout update(UUID id, WorkoutPutRequestDTO workoutRequestDTO) {
         Workout workout = findById(id);
-        workout.setName(workoutRequestDTO.name());
-        workout.setDescription(workoutRequestDTO.description());
-        workout.setEndDate(workoutRequestDTO.endDate());
+        workout.updateValues(workoutRequestDTO);
         return workoutRepository.save(workout);
     }
 
@@ -114,31 +107,23 @@ public class WorkoutService extends CRUDService<Workout, WorkoutRequestDTO> {
 
     public Workout addSetToWorkout(UUID workoutID, ExerciseSetFullSetupDTO setDto) {
         Workout workout = findById(workoutID);
-        ExerciseSetRequestDTO exerciseSetRequestDTO =
-                ExerciseSetRequestDTO
-                        .builder()
-                        .name(setDto.name())
-                        .description(setDto.description())
-                        .weekDay(setDto.weekDay())
-                        .build();
-
-        ExerciseSet exerciseSet = exerciseSetService.save(exerciseSetRequestDTO);
+        ExerciseSet exerciseSet = exerciseSetService.save(setDto.toSetRequestDTO());
         exerciseSet.setExerciseSetupList(new ArrayList<>());
 
         for (ExerciseSetupFullDTO setupDto : setDto.exerciseSetupList()) {
             exerciseSet.getExerciseSetupList().add(exerciseSetupService.save(
-                    ExerciseSetupRequestDTO
-                            .builder()
-                            .exerciseId(setupDto.exerciseId())
-                            .series(setupDto.series())
-                            .repetitions(setupDto.repetitions())
-                            .rest(setupDto.rest())
-                            .observation(setupDto.observation())
-                            .build()
+                    setupDto.toRequestDTO()
             ));
         }
 
         workout.getExerciseSets().add(exerciseSet);
         return workoutRepository.save(workout);
+    }
+
+    public void finishWorkout(UUID workoutId, List<RoutineHistoryRequest> body) {
+        Workout workout = findById(workoutId);
+        for (RoutineHistoryRequest routineRequest : body) {
+            routineHistoryService.save(routineRequest, workout);
+        }
     }
 }

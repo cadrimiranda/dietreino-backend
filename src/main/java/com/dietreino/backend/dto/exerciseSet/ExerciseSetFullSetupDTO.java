@@ -10,4 +10,14 @@ import java.util.UUID;
 @Builder
 public record ExerciseSetFullSetupDTO(UUID id, String name, String description, WeekDays weekDay,
                                       List<ExerciseSetupFullDTO> exerciseSetupList) {
+
+
+    public ExerciseSetRequestDTO toSetRequestDTO() {
+        return ExerciseSetRequestDTO
+                .builder()
+                .name(name)
+                .description(description)
+                .weekDay(weekDay)
+                .build();
+    }
 }

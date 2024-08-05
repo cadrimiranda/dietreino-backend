@@ -2,6 +2,7 @@ package com.dietreino.backend.controllers;
 
 import com.dietreino.backend.domain.Workout;
 import com.dietreino.backend.dto.exerciseSet.ExerciseSetFullSetupDTO;
+import com.dietreino.backend.dto.workout.RoutineHistoryRequest;
 import com.dietreino.backend.dto.workout.WorkoutPutRequestDTO;
 import com.dietreino.backend.dto.workout.WorkoutRequestDTO;
 import com.dietreino.backend.services.WorkoutService;
@@ -69,5 +70,11 @@ public class WorkoutController extends CRUDController<Workout, WorkoutRequestDTO
     public ResponseEntity<Boolean> addExerciseSet(@PathVariable UUID workoutId, @Valid @RequestBody ExerciseSetFullSetupDTO exerciseSetFullSetupDTO) {
         Workout workout = service.addSetToWorkout(workoutId, exerciseSetFullSetupDTO);
         return ResponseEntity.ok(workout != null);
+    }
+
+    @PostMapping("/{workoutId}/finish-routine")
+    public ResponseEntity<Boolean> finishRoutine(@PathVariable UUID workoutId, @Valid @RequestBody List<RoutineHistoryRequest> body) {
+        service.finishWorkout(workoutId, body);
+        return ResponseEntity.ok(true);
     }
 }
