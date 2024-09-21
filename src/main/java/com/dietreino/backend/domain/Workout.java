@@ -1,5 +1,6 @@
 package com.dietreino.backend.domain;
 
+import com.dietreino.backend.dto.workout.WorkoutPutRequestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -37,4 +38,10 @@ public class Workout  {
     @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "workout_id")
     private List<ExerciseSet> exerciseSets;
+
+    public void updateValues(WorkoutPutRequestDTO workoutRequestDTO) {
+        this.name = workoutRequestDTO.name();
+        this.description = workoutRequestDTO.description();
+        this.endDate = workoutRequestDTO.endDate();
+    }
 }
