@@ -184,4 +184,8 @@ public class UserService {
         userWorkout.getWorkouts().removeIf(w -> w.getId().equals(workoutId));
         userRepository.save(userWorkout);
     }
+
+    public User findByEmail(String login) {
+        return userRepository.findByEmail(login).orElseThrow(() -> new EntityNotFoundException("User not found"));
+    }
 }

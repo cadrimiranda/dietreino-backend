@@ -21,4 +21,7 @@ public class UserRequestDTO {
     String planExpiration;
     String planStart;
     String nextAppoitment;
+
+    public UserRequestDTO(String john, String doe, String mail, String password) {
+    }
 }

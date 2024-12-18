@@ -1,11 +1,13 @@
 package com.dietreino.backend.services;
 
 import com.dietreino.backend.domain.User;
+import com.dietreino.backend.dto.JwtResponse;
 import com.dietreino.backend.dto.LoginRequestDTO;
 import com.dietreino.backend.dto.login.LoginResponseDTO;
 import com.dietreino.backend.dto.user.UserLoginResponse;
 import com.dietreino.backend.dto.user.UserRegisterResponse;
 import com.dietreino.backend.dto.user.UserRequestDTO;
+import com.dietreino.backend.exceptions.InvalidAccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +40,16 @@ public class AuthService {
                         .fullName(user.getName() + " " + user.getLastName())
                         .build())
                 .build();
+    }
+
+    public JwtResponse refreshToken(String refreshToken) {
+        String login = tokenService.validateToken(refreshToken, true);
+        if (login != null) {
+            String newAccessToken = tokenService.generateAccessToken(userService.findByEmail(login));
+            return new JwtResponse(newAccessToken, refreshToken);
+        } else {
+            throw new InvalidAccessToken("Invalid refresh token");
+        }
     }
 
     public UserRegisterResponse register(UUID userRequestId, UserRequestDTO dto) {

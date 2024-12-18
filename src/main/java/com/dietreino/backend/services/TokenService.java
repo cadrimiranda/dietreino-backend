@@ -10,29 +10,44 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.Date;
 
 @Service
 public class TokenService {
     @Value("${api.security.token.secret}")
     private String secret;
+
     @Getter
     private final Integer timeToExpire = 12;
+
     @Value("${api.security.token.refresh_secret}")
     private String refreshSecret;
+
+
+    @Value("${jwt.expiration}")
+    private long jwtExpiration;
+
+    @Value("${jwt.refreshExpiration}")
+    private long refreshExpiration;
+
     private final String issuer = "dietreino";
+
+    public String generateAccessToken(User user) {
+        return generateToken(user, false);
+    }
+
+    public String generateRefreshToken(User user) {
+        return generateToken(user, true);
+    }
 
     public String generateToken(User user, Boolean refresh) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(this.secret);
+            Algorithm algorithm = Algorithm.HMAC256(refresh ? refreshSecret : secret);
             return JWT.create()
-                    .withIssuer(refresh ? refreshSecret : issuer)
+                    .withIssuer(issuer)
                     .withSubject(user.getEmail())
                     .withClaim("user_id", user.getId().toString())
-                    .withExpiresAt(this.generateExpirationDate())
+                    .withExpiresAt(this.generateExpirationDate(refresh))
                     .sign(algorithm);
         } catch (JWTCreationException exception) {
             throw new RuntimeException("JWT generation failed", exception);
@@ -41,9 +56,9 @@ public class TokenService {
 
     private DecodedJWT decode(String token, Boolean refresh) {
         try {
-            Algorithm algorithm = Algorithm.HMAC256(this.secret);
+            Algorithm algorithm = Algorithm.HMAC256(refresh ? refreshSecret : secret);
             return JWT.require(algorithm)
-                    .withIssuer(refresh ? refreshSecret : issuer)
+                    .withIssuer(issuer)
                     .build()
                     .verify(token);
         } catch (JWTVerificationException exception) {
@@ -60,6 +75,7 @@ public class TokenService {
         return decoded.getSubject();
     }
 
+
     public Date getExpirationDate(String token, Boolean refresh) {
         DecodedJWT decoded = decode(token, refresh);
         if (decoded == null) {
@@ -69,7 +85,8 @@ public class TokenService {
         return decoded.getExpiresAt();
     }
 
-    private Instant generateExpirationDate() {
-        return LocalDateTime.now().plusHours(timeToExpire).toInstant(ZoneOffset.of("-3"));
+    private Date generateExpirationDate(Boolean refresh) {
+        long expirationTime = refresh ? refreshExpiration : jwtExpiration;
+        return new Date(System.currentTimeMillis() + expirationTime);
     }
 }

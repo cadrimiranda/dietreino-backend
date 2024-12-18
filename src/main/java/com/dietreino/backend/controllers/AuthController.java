@@ -1,6 +1,8 @@
 package com.dietreino.backend.controllers;
 
+import com.dietreino.backend.dto.JwtResponse;
 import com.dietreino.backend.dto.LoginRequestDTO;
+import com.dietreino.backend.dto.TokenRefreshRequest;
 import com.dietreino.backend.dto.login.LoginResponseDTO;
 import com.dietreino.backend.dto.user.UserRegisterResponse;
 import com.dietreino.backend.dto.user.UserRequestDTO;
@@ -35,5 +37,11 @@ public class AuthController {
     public ResponseEntity<UserRegisterResponse> register(HttpServletRequest request, @RequestBody UserRequestDTO body) {
         UUID userRequestId = (UUID) request.getAttribute("user_id");
         return ResponseEntity.ok(authService.register(userRequestId, body));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody TokenRefreshRequest request) {
+        JwtResponse response = authService.refreshToken(request.refreshToken());
+        return ResponseEntity.ok(response);
     }
 }
