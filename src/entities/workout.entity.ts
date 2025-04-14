@@ -4,26 +4,23 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
-  OneToMany,
+  ManyToOne,
 } from 'typeorm';
-import { Workout } from './workout.entity';
+import { User } from './user.entity';
 
-@Entity('users')
-export class User {
+@Entity('workouts')
+export class Workout {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column()
   name: string;
 
-  @Column({ unique: true })
-  email: string;
-
   @Column()
-  password: string;
+  type: string;
 
-  @OneToMany(() => Workout, (workout) => workout.user)
-  workouts: Workout[];
+  @ManyToOne(() => User, (user) => user.workouts)
+  user: User;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

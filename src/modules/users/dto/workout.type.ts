@@ -1,8 +1,8 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
-import { WorkoutType } from './workout.type';
+import { UserType } from './user.type';
 
 @ObjectType()
-export class UserType {
+export class WorkoutType {
   @Field(() => ID)
   id: string;
 
@@ -10,7 +10,7 @@ export class UserType {
   name: string;
 
   @Field()
-  email: string;
+  type: string;
 
   @Field()
   createdAt: Date;
@@ -18,6 +18,6 @@ export class UserType {
   @Field()
   updatedAt: Date;
 
-  @Field(() => [WorkoutType], { nullable: true })
-  workouts?: WorkoutType[];
+  @Field(() => UserType)
+  user: UserType;
 }
