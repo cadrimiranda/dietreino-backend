@@ -37,4 +37,14 @@ type UserType {
   id: ID!
   name: String!
   updatedAt: DateTime!
+  workouts: [WorkoutType!]!
+}
+
+type WorkoutType {
+  createdAt: DateTime!
+  id: ID!
+  name: String!
+  type: String!
+  updatedAt: DateTime!
+  user: UserType!
 }

@@ -38,10 +38,12 @@ export class UsersRepository {
   }
 
   async findUserWorkouts(userId: string): Promise<Workout[]> {
-    const user = await this.repository.findOne({
-      where: { id: userId },
-      relations: ['workouts'],
-    });
+    const user = await this.repository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.workouts', 'workouts')
+      .where('user.id = :userId', { userId })
+      .getOne();
+
     return user?.workouts || [];
   }
 }

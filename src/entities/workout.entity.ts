@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -19,7 +20,11 @@ export class Workout {
   @Column()
   type: string;
 
+  @Column({ name: 'user_id' })
+  userId: string;
+
   @ManyToOne(() => User, (user) => user.workouts)
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
   @CreateDateColumn({ name: 'created_at' })
