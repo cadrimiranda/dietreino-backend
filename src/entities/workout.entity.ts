@@ -1,35 +1,45 @@
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
+  Column,
   ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { WorkoutExercise } from './workout-exercise.entity';
+import { Stretch } from './stretch.entity';
 
-@Entity('workouts')
+@Entity('workout')
 export class Workout {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @Column()
-  name: string;
+  @Column({ type: 'uuid' })
+  user_id: string;
 
-  @Column()
-  type: string;
-
-  @Column({ name: 'user_id' })
-  userId: string;
-
-  @ManyToOne(() => User, (user) => user.workouts)
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  @Column({ length: 100 })
+  name: string;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  updatedAt: Date;
+  @Column({ type: 'int' })
+  week_start: number;
+
+  @Column({ type: 'int' })
+  week_end: number;
+
+  @Column({ type: 'date', default: () => 'CURRENT_DATE' })
+  created_at: Date;
+
+  @Column({ type: 'boolean', default: false })
+  is_active: boolean;
+
+  @OneToMany(() => WorkoutExercise, (we: WorkoutExercise) => we.workout)
+  workoutExercises: WorkoutExercise[];
+
+  @OneToMany(() => Stretch, (stretch: Stretch) => stretch.workout)
+  stretches: Stretch[];
 }

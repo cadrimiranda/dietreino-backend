@@ -1,7 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { User } from '../../entities/user.entity';
-import { Workout } from '../../entities/workout.entity';
 
 @Injectable()
 export class UsersService {
@@ -38,9 +37,5 @@ export class UsersService {
 
   async findAll(): Promise<User[]> {
     return this.usersRepository.findAll();
-  }
-
-  getUserWorkouts(userId: string): Promise<Workout[]> {
-    return this.usersRepository.findUserWorkouts(userId);
   }
 }

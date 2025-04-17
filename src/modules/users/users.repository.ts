@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entities/user.entity';
-import { Workout } from '../../entities/workout.entity';
 
 @Injectable()
 export class UsersRepository {
@@ -35,15 +34,5 @@ export class UsersRepository {
 
   async findAll(): Promise<User[]> {
     return this.repository.find();
-  }
-
-  async findUserWorkouts(userId: string): Promise<Workout[]> {
-    const user = await this.repository
-      .createQueryBuilder('user')
-      .leftJoinAndSelect('user.workouts', 'workouts')
-      .where('user.id = :userId', { userId })
-      .getOne();
-
-    return user?.workouts || [];
   }
 }

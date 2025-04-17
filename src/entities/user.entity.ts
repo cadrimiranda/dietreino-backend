@@ -22,12 +22,12 @@ export class User {
   @Column()
   password: string;
 
-  @OneToMany(() => Workout, (workout) => workout.user)
-  workouts: Workout[];
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
+
+  @OneToMany(() => Workout, (workout) => workout.user)
+  workouts: Workout[];
 }

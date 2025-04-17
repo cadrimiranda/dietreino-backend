@@ -1,7 +1,7 @@
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 @ObjectType()
-export class UserType {
+export class ExerciseType {
   @Field(() => ID)
   id: string;
 
@@ -9,11 +9,8 @@ export class UserType {
   name: string;
 
   @Field()
-  email: string;
+  muscleGroup: string;
 
-  @Field()
-  createdAt: Date;
-
-  @Field()
-  updatedAt: Date;
+  @Field({ nullable: true })
+  videoLink?: string;
 }
