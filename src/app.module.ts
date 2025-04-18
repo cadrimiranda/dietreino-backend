@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
@@ -8,7 +9,12 @@ import { AppService } from './app.service';
 import * as Entities from './entities';
 import { UsersModule } from './modules/users/users.module';
 import { WorkoutModule } from './modules/workout/workout.module';
+import { XlsxModule } from './modules/xlsx/xlsx.module';
 import { join } from 'path';
+import { MiddlewareConsumer, NestModule } from '@nestjs/common';
+
+// Importe o middleware diretamente - não como um objeto
+import { graphqlUploadExpress } from 'graphql-upload-minimal';
 
 @Module({
   imports: [
@@ -32,8 +38,21 @@ import { join } from 'path';
     }),
     UsersModule,
     WorkoutModule,
+    XlsxModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        graphqlUploadExpress({
+          maxFileSize: 10_000_000,
+          maxFiles: 1,
+        }) as any,
+      )
+      .forRoutes('graphql');
+  }
+}

@@ -8,20 +8,57 @@ input CreateUserInput {
   password: String!
 }
 
+input CreateWorkoutInput {
+  isActive: Boolean! = false
+  name: String!
+  userId: String!
+  weekEnd: Int!
+  weekStart: Int!
+}
+
 """
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
 
+type ExerciseInfo {
+  name: String!
+  rawReps: String!
+  repSchemes: [RepRange!]!
+}
+
 type Mutation {
   createUser(createUserInput: CreateUserInput!): UserType!
+  createWorkout(createWorkoutInput: CreateWorkoutInput!): WorkoutType!
   deleteUser(id: ID!): Boolean!
+  deleteWorkout(id: ID!): Boolean!
+  extractExerciseNames(file: Upload!): [SheetExercises!]!
+  processXlsx(file: Upload!): XlsxData!
   updateUser(updateUserInput: UpdateUserInput!): UserType!
+  updateWorkout(updateWorkoutInput: UpdateWorkoutInput!): WorkoutType
 }
 
 type Query {
   user(id: ID!): UserType!
   users: [UserType!]!
+  workout(id: ID!): WorkoutType
+  workouts: [WorkoutType!]!
+}
+
+type RepRange {
+  maxReps: Int!
+  minReps: Int!
+  sets: Int!
+}
+
+type SheetData {
+  data: [[String!]!]!
+  name: String!
+}
+
+type SheetExercises {
+  exercises: [ExerciseInfo!]!
+  sheetName: String!
 }
 
 input UpdateUserInput {
@@ -31,10 +68,35 @@ input UpdateUserInput {
   password: String
 }
 
+input UpdateWorkoutInput {
+  id: ID!
+  isActive: Boolean
+  name: String
+  weekEnd: Int
+  weekStart: Int
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
+
 type UserType {
   createdAt: DateTime!
   email: String!
   id: ID!
   name: String!
   updatedAt: DateTime!
+}
+
+type WorkoutType {
+  createdAt: DateTime!
+  id: ID!
+  isActive: Boolean!
+  name: String!
+  userId: String!
+  weekEnd: Int!
+  weekStart: Int!
+}
+
+type XlsxData {
+  sheets: [SheetData!]!
 }

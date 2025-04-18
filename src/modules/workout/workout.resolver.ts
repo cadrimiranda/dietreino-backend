@@ -1,8 +1,8 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { WorkoutService } from './workout.service';
 import { WorkoutType } from './workout.type';
-import { CreateWorkoutInput } from './create-workout.input';
-import { UpdateWorkoutInput } from './update-workout.input';
+import { CreateWorkoutInput } from './dto/create-workout.input';
+import { UpdateWorkoutInput } from './dto/update-workout.input';
 import { Workout } from '../../entities/workout.entity';
 
 @Resolver(() => WorkoutType)
