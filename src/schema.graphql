@@ -25,6 +25,7 @@ type ExerciseInfo {
   name: String!
   rawReps: String!
   repSchemes: [RepRange!]!
+  restIntervals: String!
 }
 
 type Mutation {
@@ -32,10 +33,16 @@ type Mutation {
   createWorkout(createWorkoutInput: CreateWorkoutInput!): WorkoutType!
   deleteUser(id: ID!): Boolean!
   deleteWorkout(id: ID!): Boolean!
-  extractExerciseNames(file: Upload!): [SheetExercises!]!
+  extractWorkoutSheet(file: Upload!): [SheetExercises!]!
+  processWorkoutFile(input: ProcessWorkoutFileInput!): WorkoutPreviewType!
   processXlsx(file: Upload!): XlsxData!
   updateUser(updateUserInput: UpdateUserInput!): UserType!
   updateWorkout(updateWorkoutInput: UpdateWorkoutInput!): WorkoutType
+}
+
+input ProcessWorkoutFileInput {
+  file: Upload!
+  userId: String!
 }
 
 type Query {
@@ -85,6 +92,24 @@ type UserType {
   id: ID!
   name: String!
   updatedAt: DateTime!
+}
+
+type WorkoutExercisePreviewType {
+  exerciseName: String!
+  notes: String
+  order: Int!
+  repetitions: String!
+  rest: String!
+  sets: Int!
+}
+
+type WorkoutPreviewType {
+  exercises: [WorkoutExercisePreviewType!]!
+  isActive: Boolean!
+  name: String!
+  userId: String!
+  weekEnd: Int!
+  weekStart: Int!
 }
 
 type WorkoutType {
