@@ -4,10 +4,16 @@ import { WorkoutType } from './workout.type';
 import { CreateWorkoutInput } from './dto/create-workout.input';
 import { UpdateWorkoutInput } from './dto/update-workout.input';
 import { Workout } from '../../entities/workout.entity';
+import { XlsxService } from '../xlsx/xlsx.service';
+import { ProcessWorkoutFileInput } from './dto/process-workout-file.input';
+import { WorkoutPreviewType } from './dto/workout-preview.type';
 
 @Resolver(() => WorkoutType)
 export class WorkoutResolver {
-  constructor(private readonly workoutService: WorkoutService) {}
+  constructor(
+    private readonly workoutService: WorkoutService,
+    private readonly xlsxService: XlsxService,
+  ) {}
 
   private toWorkoutType = (entity: Workout): WorkoutType => {
     return {
@@ -71,5 +77,62 @@ export class WorkoutResolver {
   ): Promise<boolean> {
     await this.workoutService.delete(id);
     return true;
+  }
+
+  @Mutation(() => WorkoutPreviewType)
+  async processWorkoutFile(
+    @Args('input') input: ProcessWorkoutFileInput,
+  ): Promise<WorkoutPreviewType> {
+    // Extrair os exercícios do arquivo XLSX
+    const sheetExercises = await this.xlsxService.extractWorkoutSheet(
+      input.file,
+    );
+
+    // Preparar a prévia do workout
+    const workoutPreview: WorkoutPreviewType = {
+      userId: input.userId,
+      name: 'Novo Treino', // Nome default que o usuário pode alterar posteriormente
+      weekStart: 1, // Valores default que o usuário pode alterar
+      weekEnd: 7,
+      isActive: false,
+      exercises: [],
+    };
+
+    // Processar os exercícios encontrados nas planilhas
+    if (sheetExercises && sheetExercises.length > 0) {
+      let exerciseOrder = 1;
+
+      // Para cada planilha que contém exercícios
+      sheetExercises.forEach((sheet) => {
+        // Para cada exercício na planilha
+        sheet.exercises.forEach((exercise) => {
+          // Obter o esquema de repetições
+          const repScheme =
+            exercise.repSchemes && exercise.repSchemes.length > 0
+              ? exercise.repSchemes[0]
+              : { sets: 3, minReps: 10, maxReps: 12 };
+
+          // Formatar a string de repetições
+          let repetitionsStr = '';
+          if (repScheme.minReps === repScheme.maxReps) {
+            repetitionsStr = `${repScheme.minReps}`;
+          } else {
+            repetitionsStr = `${repScheme.minReps}-${repScheme.maxReps}`;
+          }
+
+          // Adicionar o exercício à prévia
+          workoutPreview.exercises.push({
+            exerciseName: exercise.name,
+            order: exerciseOrder++,
+            sets: repScheme.sets,
+            repetitions: repetitionsStr,
+            rest: exercise.restIntervals.join(' - '), // Valor default
+            notes: undefined,
+          });
+        });
+      });
+    }
+
+    return workoutPreview;
   }
 }
