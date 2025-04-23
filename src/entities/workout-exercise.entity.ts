@@ -9,6 +9,8 @@ import {
 import { Workout } from './workout.entity';
 import { Exercise } from './exercise.entity';
 import { WeeklyLoad } from './weekly-load.entity';
+import { RepScheme } from './rep-scheme.entity';
+import { RestInterval } from './rest-interval.entity';
 
 @Entity('workout_exercises')
 export class WorkoutExercise {
@@ -40,6 +42,9 @@ export class WorkoutExercise {
   @Column({ length: 20 })
   repetitions: string;
 
+  @Column({ length: 100, nullable: true })
+  raw_reps: string;
+
   @Column({ length: 20 })
   rest: string;
 
@@ -48,4 +53,10 @@ export class WorkoutExercise {
 
   @OneToMany(() => WeeklyLoad, (wl: WeeklyLoad) => wl.workoutExercise)
   weeklyLoads: WeeklyLoad[];
+
+  @OneToMany(() => RepScheme, (rs: RepScheme) => rs.workoutExercise)
+  repSchemes: RepScheme[];
+
+  @OneToMany(() => RestInterval, (ri: RestInterval) => ri.workoutExercise)
+  restIntervals: RestInterval[];
 }
